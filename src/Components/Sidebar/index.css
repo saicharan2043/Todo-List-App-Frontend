@@ -1,0 +1,57 @@
+.side-bar {
+  height: 100%;
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ul-of-tabs {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 5px;
+}
+
+.list-of-tabs {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 15px;
+}
+
+.icon-of-tab {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+}
+
+.title-of-tab {
+  font-size: 20px;
+  color: black;
+}
+
+.container-of-checkbox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.checkbox {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+  background-color: transparent;
+}
+
+.label-of-checkbox {
+  font-size: 18px;
+  color: black;
+}
+
+.active-tab {
+  border: 3px solid black;
+  border-top-width: 0px;
+  border-bottom-width: 0px;
+  border-right-width: 0px;
+}
