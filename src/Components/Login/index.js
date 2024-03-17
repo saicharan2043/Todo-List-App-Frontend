@@ -35,7 +35,7 @@ class Login extends Component {
     if (response.ok) {
       Cookies.set("user_id", JSON.stringify(data.id));
       const { history } = this.props;
-      history.replace("/");
+      history.replace("/home");
     } else {
       this.setState({ errorMsg: data.error_msg });
     }

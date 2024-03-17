@@ -9,7 +9,7 @@ const AllTodoDetails = React.createContext({
   changeCantegory: () => {},
   AlltodoList: [],
   fliterTodoList: [],
-  category: "Work",
+  category: "All",
 });
 
 export default AllTodoDetails;

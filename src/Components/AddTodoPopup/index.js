@@ -4,7 +4,7 @@ import AllTodoDetails from "../Context/AllTodoDetails";
 import "./index.css";
 
 class AddTodoPopup extends Component {
-  state = { title: "", description: "", category: "All" };
+  state = { title: "", description: "", category: "Work" };
 
   changeTitle = (e) => {
     this.setState({ title: e.target.value });

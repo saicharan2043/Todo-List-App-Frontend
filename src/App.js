@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Route, Switch, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from "./Components/Home";
 import AllTodoDetails from "./Components/Context/AllTodoDetails";
 import LoginAndCreateAccountPage from "./Components/LoginAndCreateAccountPage";
@@ -13,6 +13,31 @@ class App extends Component {
     fliterTodoList: [],
     hideTask: false,
     category: "All",
+  };
+
+  componentDidMount() {
+    this.getdata();
+  }
+
+  getdata = async () => {
+    const userId = Cookies.get("user_id");
+    const response = await fetch("http://localhost:5000/getalldata", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: userId }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      const updateData = data.map((eachValue) => {
+        if (eachValue.isCheckTrue === 0) {
+          return { ...eachValue, isCheckTrue: false };
+        }
+        return { ...eachValue, isCheckTrue: true };
+      });
+      this.setState({ AlltodoList: updateData }, this.filterTheData);
+    }
   };
 
   filterTheData = () => {
@@ -58,7 +83,7 @@ class App extends Component {
     );
   };
 
-  taskStatus = (id) => {
+  taskStatus = async (id) => {
     const { AlltodoList } = this.state;
     const updateData = AlltodoList.map((eachValue) => {
       if (eachValue.id === id) {
@@ -67,21 +92,44 @@ class App extends Component {
       return eachValue;
     });
     this.setState({ AlltodoList: updateData }, this.filterTheData);
+    const userUpdate = updateData.filter((eachValue) => eachValue.id === id);
+    console.log(userUpdate);
+    await fetch("http://localhost:5000/updateischeck", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...userUpdate[0] }),
+    });
   };
 
-  updateTodoItem = (updateIteam) => {
+  updateTodoItem = async (updateIteam) => {
     const { AlltodoList } = this.state;
     const updateData = AlltodoList.filter(
       (eachValue) => eachValue.id !== updateIteam.id
     );
     updateData.unshift(updateIteam);
     this.setState({ AlltodoList: updateData }, this.filterTheData);
+    await fetch("http://localhost:5000/updatetodo", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updateIteam),
+    });
   };
 
-  deleteTodoItem = (id) => {
+  deleteTodoItem = async (id) => {
     const { AlltodoList } = this.state;
     const updateData = AlltodoList.filter((eachValue) => eachValue.id !== id);
     this.setState({ AlltodoList: updateData }, this.filterTheData);
+    await fetch("http://localhost:5000/deletetodo", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
   };
 
   changeCantegory = (newCantegory) => {
@@ -106,10 +154,9 @@ class App extends Component {
       >
         <BrowserRouter>
           <Switch>
-            <Route exact path="/login" Component={LoginAndCreateAccountPage} />
-            <ProtectedRoute exact path="/" component={Home} />
+            <Route exact path="/login" component={LoginAndCreateAccountPage} />
+            <Route exact path="/home" component={Home} />
           </Switch>
-          <LoginAndCreateAccountPage />
         </BrowserRouter>
       </AllTodoDetails.Provider>
     );

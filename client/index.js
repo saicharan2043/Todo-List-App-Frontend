@@ -8,12 +8,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://online-shoping-app.netlify.app",
-      "https://jobby-web-application.netlify.app",
-      "https://nxtonlinestore.ccbp.tech",
-    ],
+    origin: ["http://localhost:3000"],
     methods: ["POST", "DELETE", "PUT", "GET"],
   })
 );
@@ -29,10 +24,6 @@ const connection = mysql.createConnection({
 connection.connect(function (error) {
   if (error) throw error;
   console.log("database successfuly connected..");
-});
-
-app.get("/", (req, rep) => {
-  rep.send({ msg: "hello" });
 });
 
 app.post("/register", async (request, response) => {
@@ -104,14 +95,64 @@ app.post("/login", (request, response) => {
   );
 });
 
-app.get("/addtodo" , (req , resp)=>{
-    const {id , title , description , category , isCheckTrue , user_id} = req.body
-    connection.query(`insert into todos_details(id , title , description , category , isCheckTrue , user_id)values(
-        '${id}','${title}','${description}','${category}',${isCheckTrue},${user_id}
-    )` , (error , reslut)=>{
-        if (error) throw
-        console.log("data add successfuly")
-    }) 
-})
+app.post("/addtodo", (req, resp) => {
+  const { id, title, description, category, isCheckTrue, user_id } = req.body;
+  connection.query(
+    `insert into todos_details(id , title , description , category , isCheckTrue , user_id)values(
+        '${id}','${title}','${description}','${category}',${isCheckTrue},${user_id})`,
+    (error, reslut) => {
+      if (error) throw error;
+      resp.status(200).json({ msg: "data add successfuly" });
+    }
+  );
+});
+
+app.put("/updatetodo", (req, resp) => {
+  const { id, title, description, category, isCheckTrue } = req.body;
+  connection.query(
+    `update todos_details set title = '${title}' , description='${description}', category = '${category}' , isCheckTrue = ${isCheckTrue} where id = '${id}'`,
+    (error, reslut) => {
+      if (error) throw error;
+      resp.status(200).json({ msg: "data updated successfuly" });
+    }
+  );
+});
+
+app.delete("/deletetodo", (req, resp) => {
+  const { id } = req.body;
+  connection.query(
+    `delete from todos_details where id = '${id}'`,
+    (error, result) => {
+      if (error) throw error;
+      console.log("delete successfully");
+    }
+  );
+});
+
+app.put("/updateischeck", (req, resp) => {
+  const { isCheckTrue, id } = req.body;
+  console.log(isCheckTrue);
+  connection.query(
+    `update todos_details set isCheckTrue = ${isCheckTrue} where id = '${id}'`,
+    (error, reslut) => {
+      if (error) throw error;
+      resp.status(200).json({ msg: "data updated successfuly" });
+    }
+  );
+});
+
+app.post("/getalldata", (req, resp) => {
+  const { id } = req.body;
+  connection.query(
+    `select * from todos_details where user_id = ${id}`,
+    (error, result) => {
+      if (error) {
+        resp.status(400).json({ error_msg: "database error" });
+      } else {
+        resp.status(200).json(result);
+      }
+    }
+  );
+});
 
 app.listen(5000, () => console.log("server is running 5000 port"));

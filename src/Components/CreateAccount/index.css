@@ -49,6 +49,7 @@
   border-radius: 50px;
   border-width: 0px;
   margin-top: 10px;
+  cursor: pointer;
 }
 
 .btn-title-of-create-account {
