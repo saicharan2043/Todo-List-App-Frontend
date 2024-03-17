@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import Home from "./Components/Home";
 import AllTodoDetails from "./Components/Context/AllTodoDetails";
 import LoginAndCreateAccountPage from "./Components/LoginAndCreateAccountPage";
@@ -21,13 +21,16 @@ class App extends Component {
 
   getdata = async () => {
     const userId = Cookies.get("user_id");
-    const response = await fetch("http://localhost:5000/getalldata", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: userId }),
-    });
+    const response = await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/getalldata",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: userId }),
+      }
+    );
     const data = await response.json();
     if (response.ok) {
       const updateData = data.map((eachValue) => {
@@ -67,13 +70,16 @@ class App extends Component {
     );
     const userId = Cookies.get("user_id");
     const updatedtodoItem = { ...newTodoItem, user_id: userId };
-    await fetch("http://localhost:5000/addtodo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedtodoItem),
-    });
+    await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/addtodo",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedtodoItem),
+      }
+    );
   };
 
   hideTaskBtn = () => {
@@ -94,13 +100,16 @@ class App extends Component {
     this.setState({ AlltodoList: updateData }, this.filterTheData);
     const userUpdate = updateData.filter((eachValue) => eachValue.id === id);
     console.log(userUpdate);
-    await fetch("http://localhost:5000/updateischeck", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...userUpdate[0] }),
-    });
+    await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/updateischeck",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...userUpdate[0] }),
+      }
+    );
   };
 
   updateTodoItem = async (updateIteam) => {
@@ -110,26 +119,32 @@ class App extends Component {
     );
     updateData.unshift(updateIteam);
     this.setState({ AlltodoList: updateData }, this.filterTheData);
-    await fetch("http://localhost:5000/updatetodo", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateIteam),
-    });
+    await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/updatetodo",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateIteam),
+      }
+    );
   };
 
   deleteTodoItem = async (id) => {
     const { AlltodoList } = this.state;
     const updateData = AlltodoList.filter((eachValue) => eachValue.id !== id);
     this.setState({ AlltodoList: updateData }, this.filterTheData);
-    await fetch("http://localhost:5000/deletetodo", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    });
+    await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/deletetodo",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      }
+    );
   };
 
   changeCantegory = (newCantegory) => {
@@ -155,8 +170,9 @@ class App extends Component {
         <BrowserRouter>
           <Switch>
             <Route exact path="/login" component={LoginAndCreateAccountPage} />
-            <Route exact path="/home" component={Home} />
+            <Route exact path="/" component={Home} />
           </Switch>
+          <Redirect to="/login" />
         </BrowserRouter>
       </AllTodoDetails.Provider>
     );

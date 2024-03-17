@@ -28,19 +28,22 @@ class CreateAccount extends Component {
       password,
     };
 
-    const response = await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(details),
-    });
+    const response = await fetch(
+      "https://backend-todo-app-terranxt-assignment.onrender.com/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(details),
+      }
+    );
     const data = await response.json();
     console.log(data);
     if (response.ok) {
       Cookies.set("user_id", JSON.stringify(data.id));
       const { history } = this.props;
-      history.replace("/home");
+      history.replace("/");
     } else {
       this.setState({ errorMsg: data.error_msg });
     }

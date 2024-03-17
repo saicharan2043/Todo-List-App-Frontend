@@ -16,7 +16,6 @@ class Home extends Component {
   };
 
   editExitingItem = () => {
-    console.log("hello");
     this.setState((privews) => ({ isUpdateTrue: !privews.isUpdateTrue }));
   };
 

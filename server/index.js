@@ -2,13 +2,21 @@ const express = require("express");
 const mysql = require("mysql");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const dotenv = require("dotenv");
 const app = express();
+
+dotenv.config({
+  path: "./data/config.env",
+});
 
 app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: [
+      "http://localhost:3000",
+      "https://todo-application-assignment.netlify.app",
+    ],
     methods: ["POST", "DELETE", "PUT", "GET"],
   })
 );
@@ -24,6 +32,10 @@ const connection = mysql.createConnection({
 connection.connect(function (error) {
   if (error) throw error;
   console.log("database successfuly connected..");
+});
+
+app.get("/", (req, resp) => {
+  resp.send("hello");
 });
 
 app.post("/register", async (request, response) => {
@@ -155,4 +167,6 @@ app.post("/getalldata", (req, resp) => {
   );
 });
 
-app.listen(5000, () => console.log("server is running 5000 port"));
+app.listen(process.env.PORT, () =>
+  console.log(`server is running port ${process.env.PORT}`)
+);
