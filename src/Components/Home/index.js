@@ -3,19 +3,32 @@ import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import TodoListItem from "../TodoListItem";
 import AddTodoPopup from "../AddTodoPopup";
+import UpdateTodoPopup from "../UpdateTodoPopup";
 
 import "./index.css";
 import AllTodoDetails from "../Context/AllTodoDetails";
 
 class Home extends Component {
-  state = { isAddTrue: false };
+  state = { isAddTrue: false, isUpdateTrue: false, updateItemData: {} };
 
   setNewTodoItem = () => {
     this.setState((privews) => ({ isAddTrue: !privews.isAddTrue }));
   };
 
+  editExitingItem = () => {
+    console.log("hello");
+    this.setState((privews) => ({ isUpdateTrue: !privews.isUpdateTrue }));
+  };
+
+  clickUpdateBtn = (value) => {
+    this.setState((privews) => ({
+      isUpdateTrue: !privews.isUpdateTrue,
+      updateItemData: value,
+    }));
+  };
+
   render() {
-    const { isAddTrue } = this.state;
+    const { isAddTrue, isUpdateTrue, updateItemData } = this.state;
     return (
       <AllTodoDetails.Consumer>
         {(value) => {
@@ -31,6 +44,7 @@ class Home extends Component {
                       <TodoListItem
                         eachTodoList={eachValue}
                         key={eachValue.id}
+                        clickUpdateBtn={this.clickUpdateBtn}
                       />
                     ))}
                   </ul>
@@ -42,6 +56,12 @@ class Home extends Component {
               </div>
               {isAddTrue && (
                 <AddTodoPopup setNewTodoItem={this.setNewTodoItem} />
+              )}
+              {isUpdateTrue && (
+                <UpdateTodoPopup
+                  updateItemData={updateItemData}
+                  editExitingItem={this.editExitingItem}
+                />
               )}
             </div>
           );

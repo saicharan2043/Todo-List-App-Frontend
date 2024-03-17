@@ -1,6 +1,10 @@
 import { Component } from "react";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
 import Home from "./Components/Home";
 import AllTodoDetails from "./Components/Context/AllTodoDetails";
+import LoginAndCreateAccountPage from "./Components/LoginAndCreateAccountPage";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import Cookies from "js-cookie";
 import "./App.css";
 
 class App extends Component {
@@ -29,13 +33,22 @@ class App extends Component {
     }
   };
 
-  addNewTodoItem = (newTodoItem) => {
+  addNewTodoItem = async (newTodoItem) => {
     this.setState(
       (privews) => ({
         AlltodoList: [newTodoItem, ...privews.AlltodoList],
       }),
       this.filterTheData
     );
+    const userId = Cookies.get("user_id");
+    const updatedtodoItem = { ...newTodoItem, user_id: userId };
+    await fetch("http://localhost:5000/addtodo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedtodoItem),
+    });
   };
 
   hideTaskBtn = () => {
@@ -91,7 +104,13 @@ class App extends Component {
           changeCantegory: this.changeCantegory,
         }}
       >
-        <Home />
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/login" Component={LoginAndCreateAccountPage} />
+            <ProtectedRoute exact path="/" component={Home} />
+          </Switch>
+          <LoginAndCreateAccountPage />
+        </BrowserRouter>
       </AllTodoDetails.Provider>
     );
   }

@@ -1,17 +1,64 @@
+import { useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
+import { VscExpandAll } from "react-icons/vsc";
+import { MdOutlineWork } from "react-icons/md";
+import { PiStudentBold } from "react-icons/pi";
 import { FaMasksTheater } from "react-icons/fa6";
+import { MdOutlineFamilyRestroom } from "react-icons/md";
 import "./index.css";
 import "../Sidebar/index.css";
 import AllTodoDetails from "../Context/AllTodoDetails";
 
 const TodoListItem = (props) => {
-  const { eachTodoList } = props;
+  const [isDeleteEditPopTrue, setIsDeleteEditPopTrue] = useState(false);
+  const { eachTodoList, clickUpdateBtn } = props;
   const { title, description, category, isCheckTrue, id } = eachTodoList;
-  console.log(isCheckTrue);
+
+  const showUpdateAndDeletePopup = (deleteTodoItem) => {
+    return (
+      <div className="delete-edit-container">
+        <button
+          className="button-edit"
+          onClick={() => clickUpdateBtn(eachTodoList)}
+        >
+          Edit..
+        </button>
+        <hr className="hr" />
+        <button className="button-edit" onClick={() => deleteTodoItem(id)}>
+          Delete
+        </button>
+      </div>
+    );
+  };
+
+  const getReleatedIcons = (category) => {
+    switch (category) {
+      case "All":
+        return <VscExpandAll className="icon-of-tab" />;
+        break;
+      case "Work":
+        return <MdOutlineWork className="icon-of-tab" />;
+        break;
+      case "Study":
+        return <PiStudentBold className="icon-of-tab" />;
+        break;
+      case "Entertainment":
+        return <FaMasksTheater className="icon-of-tab" />;
+        break;
+      default:
+        return <MdOutlineFamilyRestroom className="icon-of-tab" />;
+        break;
+    }
+  };
+
+  const clickTreeDots = () => {
+    setIsDeleteEditPopTrue(!isDeleteEditPopTrue);
+  };
+
   return (
     <AllTodoDetails.Consumer>
       {(value) => {
-        const { taskStatus } = value;
+        const { taskStatus, deleteTodoItem } = value;
         const ClickCompelte = () => {
           taskStatus(id);
         };
@@ -21,14 +68,14 @@ const TodoListItem = (props) => {
               <h1 className={`title-of-todo ${isCheckTrue && "hr-line"}`}>
                 {title}
               </h1>
-              <BsThreeDots className="three-dots" />
+              <BsThreeDots className="three-dots" onClick={clickTreeDots} />
             </div>
             <p className={`description ${isCheckTrue && "hr-line"}`}>
               {description}
             </p>
             <div className="bottom-container">
               <div className="horizontal-container">
-                <FaMasksTheater className="icon-of-tab" />
+                {getReleatedIcons(category)}
                 <p className="title-of-tab">{category}</p>
               </div>
               <div className="horizontal-container">
@@ -44,6 +91,7 @@ const TodoListItem = (props) => {
                 </label>
               </div>
             </div>
+            {isDeleteEditPopTrue && showUpdateAndDeletePopup(deleteTodoItem)}
           </li>
         );
       }}
