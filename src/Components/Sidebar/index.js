@@ -3,8 +3,11 @@ import { MdOutlineWork } from "react-icons/md";
 import { PiStudentBold } from "react-icons/pi";
 import { FaMasksTheater } from "react-icons/fa6";
 import { MdOutlineFamilyRestroom } from "react-icons/md";
+import { LuLogOut } from "react-icons/lu";
 import "./index.css";
 import AllTodoDetails from "../Context/AllTodoDetails";
+import { withRouter } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Categories = [
   { id: 0, title: "All" },
@@ -14,7 +17,7 @@ const Categories = [
   { id: 4, title: "Family" },
 ];
 
-const Sidebar = () => {
+const Sidebar = (props) => {
   const getReleatedIcons = (category) => {
     switch (category) {
       case "All":
@@ -35,10 +38,16 @@ const Sidebar = () => {
     }
   };
 
+  const clickLogOutBtn = () => {
+    const { history } = props;
+    Cookies.remove("user_id");
+    history.replace("/login");
+  };
+
   return (
     <AllTodoDetails.Consumer>
       {(value) => {
-        const { changeCantegory, hideTaskBtn, category } = value;
+        const { changeCantegory, hideTaskBtn, category, LogoutBtn } = value;
         return (
           <div className="side-bar">
             <ul className="ul-of-tabs">
@@ -66,6 +75,16 @@ const Sidebar = () => {
                 Hide Done Tasks
               </label>
             </div>
+            <button
+              className="logout-btn"
+              onClick={() => {
+                LogoutBtn();
+                clickLogOutBtn();
+              }}
+            >
+              Logout
+              <LuLogOut className="logout-icon" />
+            </button>
           </div>
         );
       }}
@@ -73,4 +92,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default withRouter(Sidebar);

@@ -30,12 +30,15 @@
 .title-of-tab {
   font-size: 20px;
   color: black;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 .container-of-checkbox {
   display: flex;
   align-items: center;
   width: 100%;
+  padding-left: 20px;
+  margin-bottom: 30px;
 }
 
 .checkbox {
@@ -50,6 +53,7 @@
   font-size: 18px;
   color: black;
   cursor: pointer;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 .active-tab {
@@ -57,4 +61,27 @@
   border-top-width: 0px;
   border-bottom-width: 0px;
   border-right-width: 0px;
+}
+
+.logout-icon {
+  width: 15px;
+  height: 15px;
+  align-self: center;
+  margin-left: 10px;
+}
+
+.logout-btn {
+  width: 100px;
+  height: 40px;
+  color: #ffffff;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 15px;
+  border-width: 0px;
+  background-color: #43a5be;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 15px;
 }

@@ -1,9 +1,10 @@
 import { Component } from "react";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from "./Components/Home";
 import AllTodoDetails from "./Components/Context/AllTodoDetails";
 import LoginAndCreateAccountPage from "./Components/LoginAndCreateAccountPage";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import Counter from "./Components/Counter";
 import Cookies from "js-cookie";
 import "./App.css";
 
@@ -19,10 +20,11 @@ class App extends Component {
     this.getdata();
   }
 
+  //https://backend-todo-app-terranxt-assignment.onrender.com
   getdata = async () => {
     const userId = Cookies.get("user_id");
     const response = await fetch(
-      "https://backend-todo-app-terranxt-assignment.onrender.com/getalldata",
+      "https://todo-list-app-backend-4o34.onrender.com/getalldata",
       {
         method: "POST",
         headers: {
@@ -33,13 +35,15 @@ class App extends Component {
     );
     const data = await response.json();
     if (response.ok) {
-      const updateData = data.map((eachValue) => {
-        if (eachValue.isCheckTrue === 0) {
-          return { ...eachValue, isCheckTrue: false };
-        }
-        return { ...eachValue, isCheckTrue: true };
-      });
-      this.setState({ AlltodoList: updateData }, this.filterTheData);
+      if (data.length !== 0) {
+        const updateData = data.map((eachValue) => {
+          if (eachValue.status === 0) {
+            return { ...eachValue, status: false };
+          }
+          return { ...eachValue, status: true };
+        });
+        this.setState({ AlltodoList: updateData }, this.filterTheData);
+      }
     }
   };
 
@@ -47,7 +51,7 @@ class App extends Component {
     const { AlltodoList, hideTask, category } = this.state;
     if (category === "All") {
       const checkhideTask = hideTask
-        ? AlltodoList.filter((eachValue) => eachValue.isCheckTrue === false)
+        ? AlltodoList.filter((eachValue) => eachValue.status === false)
         : AlltodoList;
       this.setState({ fliterTodoList: checkhideTask });
     } else {
@@ -55,23 +59,17 @@ class App extends Component {
         (eachValue) => eachValue.category === category
       );
       const checkhideTask = hideTask
-        ? categroyFilter.filter((eachValue) => eachValue.isCheckTrue === false)
+        ? categroyFilter.filter((eachValue) => eachValue.status === false)
         : categroyFilter;
       this.setState({ fliterTodoList: checkhideTask });
     }
   };
 
   addNewTodoItem = async (newTodoItem) => {
-    this.setState(
-      (privews) => ({
-        AlltodoList: [newTodoItem, ...privews.AlltodoList],
-      }),
-      this.filterTheData
-    );
     const userId = Cookies.get("user_id");
     const updatedtodoItem = { ...newTodoItem, user_id: userId };
-    await fetch(
-      "https://backend-todo-app-terranxt-assignment.onrender.com/addtodo",
+    const response = await fetch(
+      "https://todo-list-app-backend-4o34.onrender.com/addtodo",
       {
         method: "POST",
         headers: {
@@ -80,6 +78,14 @@ class App extends Component {
         body: JSON.stringify(updatedtodoItem),
       }
     );
+    if (response.ok) {
+      this.setState(
+        (privews) => ({
+          AlltodoList: [newTodoItem, ...privews.AlltodoList],
+        }),
+        this.filterTheData
+      );
+    }
   };
 
   hideTaskBtn = () => {
@@ -93,15 +99,14 @@ class App extends Component {
     const { AlltodoList } = this.state;
     const updateData = AlltodoList.map((eachValue) => {
       if (eachValue.id === id) {
-        return { ...eachValue, isCheckTrue: !eachValue.isCheckTrue };
+        return { ...eachValue, status: !eachValue.status };
       }
       return eachValue;
     });
     this.setState({ AlltodoList: updateData }, this.filterTheData);
     const userUpdate = updateData.filter((eachValue) => eachValue.id === id);
-    console.log(userUpdate);
     await fetch(
-      "https://backend-todo-app-terranxt-assignment.onrender.com/updateischeck",
+      "https://todo-list-app-backend-4o34.onrender.com/updateischeck",
       {
         method: "PUT",
         headers: {
@@ -114,13 +119,8 @@ class App extends Component {
 
   updateTodoItem = async (updateIteam) => {
     const { AlltodoList } = this.state;
-    const updateData = AlltodoList.filter(
-      (eachValue) => eachValue.id !== updateIteam.id
-    );
-    updateData.unshift(updateIteam);
-    this.setState({ AlltodoList: updateData }, this.filterTheData);
-    await fetch(
-      "https://backend-todo-app-terranxt-assignment.onrender.com/updatetodo",
+    const response = await fetch(
+      "https://todo-list-app-backend-4o34.onrender.com/updatetodo",
       {
         method: "PUT",
         headers: {
@@ -129,14 +129,19 @@ class App extends Component {
         body: JSON.stringify(updateIteam),
       }
     );
+    if (response.ok) {
+      const updateData = AlltodoList.filter(
+        (eachValue) => eachValue.id !== updateIteam.id
+      );
+      updateData.unshift(updateIteam);
+      this.setState({ AlltodoList: updateData }, this.filterTheData);
+    }
   };
 
   deleteTodoItem = async (id) => {
     const { AlltodoList } = this.state;
-    const updateData = AlltodoList.filter((eachValue) => eachValue.id !== id);
-    this.setState({ AlltodoList: updateData }, this.filterTheData);
-    await fetch(
-      "https://backend-todo-app-terranxt-assignment.onrender.com/deletetodo",
+    const response = await fetch(
+      "https://todo-list-app-backend-4o34.onrender.com/deletetodo",
       {
         method: "DELETE",
         headers: {
@@ -145,10 +150,33 @@ class App extends Component {
         body: JSON.stringify({ id }),
       }
     );
+    if (response.ok) {
+      const updateData = AlltodoList.filter((eachValue) => eachValue.id !== id);
+      this.setState({ AlltodoList: updateData }, this.filterTheData);
+    }
   };
 
   changeCantegory = (newCantegory) => {
     this.setState({ category: newCantegory }, this.filterTheData);
+  };
+
+  LogoutBtn = () => {
+    this.setState({
+      AlltodoList: [],
+      fliterTodoList: [],
+      hideTask: false,
+      category: "All",
+    });
+  };
+
+  LoginBtn = () => {
+    const uniqueId = setInterval(() => {
+      const userId = Cookies.get("user_id");
+      if (userId !== undefined) {
+        this.getdata();
+        clearInterval(uniqueId);
+      }
+    }, 500);
   };
 
   render() {
@@ -165,14 +193,15 @@ class App extends Component {
           updateTodoItem: this.updateTodoItem,
           deleteTodoItem: this.deleteTodoItem,
           changeCantegory: this.changeCantegory,
+          LogoutBtn: this.LogoutBtn,
+          LoginBtn: this.LoginBtn,
         }}
       >
         <BrowserRouter>
           <Switch>
+            <ProtectedRoute exact path="/" component={Home} />
             <Route exact path="/login" component={LoginAndCreateAccountPage} />
-            <Route exact path="/" component={Home} />
           </Switch>
-          <Redirect to="/login" />
         </BrowserRouter>
       </AllTodoDetails.Provider>
     );

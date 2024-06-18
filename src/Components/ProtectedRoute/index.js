@@ -3,6 +3,7 @@ import Cookie from "js-cookie";
 
 const ProtectedRoute = (props) => {
   const token = Cookie.get("user_id");
+  console.log(token);
   if (token === undefined) {
     return <Redirect to="/login" />;
   }

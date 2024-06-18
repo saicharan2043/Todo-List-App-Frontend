@@ -12,19 +12,28 @@ import AllTodoDetails from "../Context/AllTodoDetails";
 const TodoListItem = (props) => {
   const [isDeleteEditPopTrue, setIsDeleteEditPopTrue] = useState(false);
   const { eachTodoList, clickUpdateBtn } = props;
-  const { title, description, category, isCheckTrue, id } = eachTodoList;
+  const { title, description, category, status, id } = eachTodoList;
 
   const showUpdateAndDeletePopup = (deleteTodoItem) => {
     return (
       <div className="delete-edit-container">
         <button
           className="button-edit"
-          onClick={() => clickUpdateBtn(eachTodoList)}
+          onClick={() => {
+            clickUpdateBtn(eachTodoList);
+            setIsDeleteEditPopTrue((prev) => !prev);
+          }}
         >
           Edit..
         </button>
         <hr className="hr" />
-        <button className="button-edit" onClick={() => deleteTodoItem(id)}>
+        <button
+          className="button-edit"
+          onClick={() => {
+            deleteTodoItem(id);
+            setIsDeleteEditPopTrue((prev) => !prev);
+          }}
+        >
           Delete
         </button>
       </div>
@@ -65,12 +74,12 @@ const TodoListItem = (props) => {
         return (
           <li className="list-of-todo">
             <div className="container-of-heading">
-              <h1 className={`title-of-todo ${isCheckTrue && "hr-line"}`}>
+              <h1 className={`title-of-todo ${status && "hr-line"}`}>
                 {title}
               </h1>
               <BsThreeDots className="three-dots" onClick={clickTreeDots} />
             </div>
-            <p className={`description ${isCheckTrue && "hr-line"}`}>
+            <p className={`description ${status && "hr-line"}`}>
               {description}
             </p>
             <div className="bottom-container">
@@ -84,7 +93,7 @@ const TodoListItem = (props) => {
                   className="checkbox"
                   id="done"
                   onChange={ClickCompelte}
-                  checked={isCheckTrue}
+                  checked={status}
                 />
                 <label htmlFor="done" className="label-of-checkbox">
                   Done

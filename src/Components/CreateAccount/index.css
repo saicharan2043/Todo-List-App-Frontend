@@ -1,7 +1,7 @@
 .bg-container-create-account {
   width: 387px;
   height: 470px;
-  background-color: rgba(0, 0, 0, 1);
+  background-color: #ffffff;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -12,14 +12,15 @@
 .rocket-logo-of-create-account {
   width: 25px;
   height: 25px;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 30px;
 }
 
 .heading-of-create-account {
   font-size: 24px;
-  font-family: "Public Sans";
-  color: #ffffff;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: #000000;
+  letter-spacing: 1px;
   font-weight: 700;
   margin-bottom: 40px;
 }
@@ -32,11 +33,12 @@
   padding-left: 25px;
   padding-right: 25px;
   font-size: 16px;
-  font-family: "Public Sans";
-  color: rgba(255, 255, 255, 1);
-  border: 1px solid rgba(255, 255, 255, 1);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: gray;
+  border: 1px solid gray;
   margin-bottom: 20px;
   background-color: transparent;
+  outline: none;
 }
 
 .btn-of-create-account {
@@ -54,7 +56,8 @@
 
 .btn-title-of-create-account {
   font-size: 16px;
-  font-family: "Public Sans";
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 1px;
   color: #ffffff;
   margin-right: 15px;
 }
@@ -68,19 +71,23 @@
 
 .note-text {
   font-size: 16px;
-  font-family: "Public Sans";
-  color: #ffffff;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: #000000;
+  letter-spacing: 1px;
   margin-top: 15px;
 }
 
 .note-btn {
   color: #0d6efd;
   cursor: pointer;
+  font-weight: bold;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 .eror-msg {
   font-size: 15px;
   color: red;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   margin-bottom: 10px;
   margin-top: 5px;
 }

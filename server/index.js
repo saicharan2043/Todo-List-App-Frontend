@@ -1,5 +1,8 @@
 const express = require("express");
-const mysql = require("mysql");
+const { open } = require("sqlite");
+const sqlite3 = require("sqlite3");
+const path = require("path");
+const dbPath = path.join(__dirname, "Todos.db");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -11,162 +14,126 @@ dotenv.config({
 
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://todo-application-assignment.netlify.app",
-    ],
-    methods: ["POST", "DELETE", "PUT", "GET"],
-  })
-);
+app.use(cors());
 
-const connection = mysql.createConnection({
-  host: "db4free.net",
-  port: 3306,
-  user: "shiva_kumar",
-  password: "sai@1234",
-  database: "user_details_db",
-});
+let db;
 
-connection.connect(function (error) {
-  if (error) throw error;
-  console.log("database successfuly connected..");
-});
+const initializeDBAndServer = async () => {
+  try {
+    db = await open({
+      filename: dbPath,
+      driver: sqlite3.Database,
+    });
+    app.listen(process.env.PORT, () =>
+      console.log(`server is running port ${process.env.PORT}`)
+    );
+  } catch (e) {
+    console.log(`Conection error ${e}`);
+  }
+};
+initializeDBAndServer();
 
 app.get("/", (req, resp) => {
   resp.send("hello");
 });
 
-app.post("/register", async (request, response) => {
-  const { username, password, name } = request.body;
-  const modifyPassword = await bcrypt.hash(password, 10);
-  connection.query(
-    `select * from user_info_of_todo_app where username = '${username}'`,
-    (error1, reslut) => {
-      if (error1) {
-        response.status(400).json({ error_msg: "database error" });
-      } else {
-        if (reslut.length === 0) {
-          connection.query(
-            `insert into user_info_of_todo_app(name , username , password)values('${name}','${username}' ,  '${modifyPassword}')`,
-            (error2, reslut2) => {
-              if (error2) {
-                response.status(400).json({ error_msg: "database error" });
-              } else {
-                connection.query(
-                  `select id from user_info_of_todo_app where username = '${username}'`,
-                  (error3, reslut3) => {
-                    if (error3) {
-                      response
-                        .status(400)
-                        .json({ error_msg: "database error" });
-                    } else {
-                      console.log(reslut3[0].id);
-                      response.status(200).json({ id: reslut3[0].id });
-                    }
-                  }
-                );
-              }
-            }
-          );
-        } else {
-          response
-            .status(400)
-            .json({ error_msg: "this username already register" });
-        }
-      }
-    }
-  );
+app.post("/register", async (req, resp) => {
+  const { username, password, name } = req.body;
+  const searchUser = `select * from user where username = '${username}'`;
+  const data = await db.get(searchUser);
+  if (data === undefined) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const storeDataQuery = `insert into user(name , username , password) values('${name}' , '${username}', '${hashedPassword}')`;
+    const response = await db.run(storeDataQuery);
+    resp.status(200);
+    resp.send({ userId: response.lastID });
+  } else {
+    resp.status(400);
+    resp.send({ error: "This username is already registered" });
+  }
 });
 
-app.post("/login", (request, response) => {
-  const { username, password } = request.body;
-  connection.query(
-    `select * from user_info_of_todo_app where username = '${username}'`,
-    async (error, reslut) => {
-      if (error) {
-        console.log(error);
-        response.status(400).json({ error_msg: "database error" });
-      } else {
-        if (reslut.length !== 0) {
-          const comperePassword = await bcrypt.compare(
-            password,
-            reslut[0].password
-          );
-          if (comperePassword) {
-            response.status(200).json({ id: reslut[0].id });
-          } else {
-            response.status(400).json({ error_msg: "password is wrong" });
-          }
-        } else {
-          response.status(400).json({ error_msg: "user is not register" });
-        }
-      }
+app.post("/login", async (req, resp) => {
+  const { username, password } = req.body;
+  const checkuser = `select * from user where username='${username}'`;
+  const response = await db.get(checkuser);
+  if (response !== undefined) {
+    const comperPassword = await bcrypt.compare(password, response.password);
+    if (comperPassword) {
+      resp.send({ userId: response.id }).status(200);
+    } else {
+      resp.status(400);
+      resp.send({ error: "password is wrong" });
     }
-  );
+  } else {
+    resp.status(400);
+    resp.send({ error: "This username is not registered" });
+  }
 });
 
-app.post("/addtodo", (req, resp) => {
-  const { id, title, description, category, isCheckTrue, user_id } = req.body;
-  connection.query(
-    `insert into todos_details(id , title , description , category , isCheckTrue , user_id)values(
-        '${id}','${title}','${description}','${category}',${isCheckTrue},${user_id})`,
-    (error, reslut) => {
-      if (error) throw error;
-      resp.status(200).json({ msg: "data add successfuly" });
-    }
-  );
+app.post("/addtodo", async (req, resp) => {
+  try {
+    const { id, title, description, category, status, user_id } = req.body;
+    const query = `insert into todos(id , title , description , category , status , user_id)values(
+          '${id}','${title}','${description}','${category}',${status},${user_id})`;
+    await db.run(query);
+    resp.status(200).json({ msg: "data add successfuly" });
+  } catch (e) {
+    resp.status(400);
+    resp.send({ msg: `something went worng ${e}` });
+  }
 });
 
-app.put("/updatetodo", (req, resp) => {
-  const { id, title, description, category, isCheckTrue } = req.body;
-  connection.query(
-    `update todos_details set title = '${title}' , description='${description}', category = '${category}' , isCheckTrue = ${isCheckTrue} where id = '${id}'`,
-    (error, reslut) => {
-      if (error) throw error;
-      resp.status(200).json({ msg: "data updated successfuly" });
-    }
-  );
+app.put("/updatetodo", async (req, resp) => {
+  const { id, title, description, category, status } = req.body;
+  try {
+    const query = `update todos set title = '${title}' , description='${description}', category = '${category}' , status = ${status} where id = '${id}'`;
+    await db.run(query);
+    resp.status(200);
+    resp.send({ msg: "Todo updated successfuly" });
+  } catch (e) {
+    resp.status(400);
+    resp.send({ msg: `something went worng ${e}` });
+  }
 });
 
-app.delete("/deletetodo", (req, resp) => {
+app.delete("/deletetodo", async (req, resp) => {
   const { id } = req.body;
-  connection.query(
-    `delete from todos_details where id = '${id}'`,
-    (error, result) => {
-      if (error) throw error;
-      console.log("delete successfully");
-    }
-  );
+  console.log(id);
+  try {
+    const query = `delete from todos where id = '${id}'`;
+    await db.run(query);
+    resp.status(200);
+    resp.send({ msg: "todo is deleted successfuly" });
+  } catch (e) {
+    resp.status(400);
+    resp.send({ msg: `something went worng ${e}` });
+  }
 });
 
-app.put("/updateischeck", (req, resp) => {
-  const { isCheckTrue, id } = req.body;
-  console.log(isCheckTrue);
-  connection.query(
-    `update todos_details set isCheckTrue = ${isCheckTrue} where id = '${id}'`,
-    (error, reslut) => {
-      if (error) throw error;
-      resp.status(200).json({ msg: "data updated successfuly" });
-    }
-  );
+app.put("/updateischeck", async (req, resp) => {
+  const { status, id } = req.body;
+  try {
+    const query = `update todos set status = ${status} where id = '${id}'`;
+    await db.run(query);
+    resp.status(200);
+    resp.send({ msg: "status updated successfuly" });
+  } catch (e) {
+    resp.status(400);
+    resp.send({ msg: `something went worng ${e}` });
+  }
 });
 
-app.post("/getalldata", (req, resp) => {
+app.post("/getalldata", async (req, resp) => {
   const { id } = req.body;
-  connection.query(
-    `select * from todos_details where user_id = ${id}`,
-    (error, result) => {
-      if (error) {
-        resp.status(400).json({ error_msg: "database error" });
-      } else {
-        resp.status(200).json(result);
-      }
-    }
-  );
+  try {
+    const query = `select * from todos where user_id = ${id}`;
+    const response = await db.all(query);
+    console.log(response);
+    resp.status(200);
+    resp.send(response);
+  } catch (e) {
+    resp.status(400);
+    resp.send({ msg: `something went worng ${e}` });
+  }
 });
-
-app.listen(process.env.PORT, () =>
-  console.log(`server is running port ${process.env.PORT}`)
-);

@@ -7,6 +7,8 @@ const AllTodoDetails = React.createContext({
   updateTodoItem: () => {},
   deleteTodoItem: () => {},
   changeCantegory: () => {},
+  LoginBtn: () => {},
+  LogoutBtn: () => {},
   AlltodoList: [],
   fliterTodoList: [],
   category: "All",

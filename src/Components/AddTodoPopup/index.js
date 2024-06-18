@@ -32,7 +32,7 @@ class AddTodoPopup extends Component {
               title,
               description,
               category,
-              isCheckTrue: false,
+              status: false,
             };
             addNewTodoItem(NewTodoDetails);
             setNewTodoItem();
@@ -53,7 +53,7 @@ class AddTodoPopup extends Component {
                 <input
                   type="text"
                   className="input"
-                  placeholder="add a title..."
+                  placeholder="Add a title..."
                   value={title}
                   onChange={this.changeTitle}
                 />
@@ -62,7 +62,7 @@ class AddTodoPopup extends Component {
                   cols={50}
                   rows={7}
                   className="text-area"
-                  placeholder="add a description"
+                  placeholder="Add a description"
                   value={description}
                   onChange={this.changeDesription}
                 ></textarea>

@@ -2,7 +2,7 @@ import { Component } from "react";
 import AllTodoDetails from "../Context/AllTodoDetails";
 import "../AddTodoPopup/index.css";
 
-class AddTodoPopup extends Component {
+class UpdateTodoPopup extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -10,6 +10,7 @@ class AddTodoPopup extends Component {
       description: props.updateItemData.description,
       category: props.updateItemData.category,
       id: props.updateItemData.id,
+      status: props.updateItemData.status,
     };
   }
 
@@ -26,8 +27,7 @@ class AddTodoPopup extends Component {
   };
 
   render() {
-    const { title, description, category, id } = this.state;
-    console.log(title);
+    const { title, description, category, id, status } = this.state;
     const { editExitingItem } = this.props;
     return (
       <AllTodoDetails.Consumer>
@@ -40,7 +40,7 @@ class AddTodoPopup extends Component {
               title,
               description,
               category,
-              isCheckTrue: false,
+              status,
             };
             updateTodoItem(updatedvalue);
             editExitingItem();
@@ -105,4 +105,4 @@ class AddTodoPopup extends Component {
   }
 }
 
-export default AddTodoPopup;
+export default UpdateTodoPopup;

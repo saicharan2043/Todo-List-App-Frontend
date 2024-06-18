@@ -38,4 +38,6 @@
 .no-result-heading {
   font-size: 50px;
   color: black;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 2px;
 }
