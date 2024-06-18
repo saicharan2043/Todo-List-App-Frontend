@@ -2,7 +2,6 @@ import { Component } from "react";
 import { Redirect } from "react-router-dom";
 import CreateAccount from "../CreateAccount";
 import Login from "../Login";
-import NavBar from "../Navbar";
 import "./index.css";
 import "../Navbar/index.css";
 import Cookies from "js-cookie";
